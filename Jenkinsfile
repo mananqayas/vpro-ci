@@ -53,7 +53,7 @@ pipeline {
 
 
 
-sh 'mvn test'
+sh 'mvn -s settings.xml  test'
             }
         }
 
@@ -62,7 +62,7 @@ sh 'mvn test'
 
 
 
-            sh 'mvn checkstyle:checkstyle'
+            sh 'mvn -s settings.xml  checkstyle:checkstyle'
             }
         }
     }

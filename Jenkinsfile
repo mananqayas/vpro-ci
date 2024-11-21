@@ -20,8 +20,8 @@ pipeline {
         NEXUS_LOGIN='nexuslogin'
         NEXUSIP='172.31.35.26'
         NEXUSPORT='8081'
-        SONERSERVER='sonarserver'
-        SONERSCANNER='sonarscanner'
+        SONARSERVER='sonarserver'
+        SONARSCANNER='sonarscanner'
     }
     stages {
 

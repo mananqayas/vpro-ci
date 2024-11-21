@@ -84,5 +84,16 @@ sh 'mvn -s settings.xml  test'
               }
             }
         }
+
+        stage('Quality Gate'){
+
+            steps {
+
+                timeout(time: 1, unit: 'HOURS'){
+
+                    waitForQualityGate abortpipeline: true
+                }
+            }
+        }
     }
 }

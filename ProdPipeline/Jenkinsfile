@@ -16,110 +16,21 @@ pipeline {
 
     environment {
 
-
-        SNAP_REPO='vprofile-snapshot'
-        NEXUS_USER='admin'
-        NEXUS_PASS='Mjunhybgt123'
-        RELEASE_REPO='vprofile-release'
-        CENTRAL_REPO='vpro-maven-central'
-        NEXUS_GRP_REPO='vprofile-maven-group'
-        NEXUS_LOGIN='nexuslogin'
-        NEXUSIP='172.31.35.26'
-        NEXUSPORT='8081'
-        SONARSERVER='sonarserver'
-        SONARSCANNER='sonarscanner'
+        cluster = 'vpro-prod-cluster'
+        service = 'vpro-prod-svc'
     }
     stages {
 
-        stage ('Build')
-
-        {
+        stage('Deploy to ECS staging'){
 
             steps {
 
 
+                withAWS(credentials: 'awscreds', region: 'us-east-1'){
 
-                sh 'mvn -s settings.xml -DskipTests install'
 
-
-            }
-
-            post {
-
-                success {
-
-                    echo 'Now Archiving ...'
-                    archiveArtifacts artifacts: '**/*.war'
+                    sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
                 }
-            }
-
-        }
-
-        stage ('Test'){
-
-            steps {
-
-
-
-sh 'mvn -s settings.xml  test'
-            }
-        }
-
-        stage ('Checkstyle analysis'){
-            steps {
-
-
-
-            sh 'mvn -s settings.xml  checkstyle:checkstyle'
-            }
-        }
-               stage('Sonar Analysis') {
-            environment {
-                scannerHome = tool "${SONARSCANNER}"
-            }
-            steps {
-               withSonarQubeEnv("${SONARSERVER}") {
-                   sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-                   -Dsonar.projectName=vprofile \
-                   -Dsonar.projectVersion=1.0 \
-                   -Dsonar.sources=src/ \
-                   -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
-                   -Dsonar.junit.reportsPath=target/surefire-reports/ \
-                   -Dsonar.jacoco.reportsPath=target/jacoco.exec \
-                   -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
-              }
-            }
-        }
-
-        stage('Quality Gate'){
-
-            steps {
-
-                timeout(time: 1, unit: 'HOURS'){
-
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
-        stage('UploadArtifact'){
-
-            steps {
-                 nexusArtifactUploader(
-        nexusVersion: 'nexus3',
-        protocol: 'http',
-        nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-        groupId: 'QA',
-        version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-        repository: "${RELEASE_REPO}",
-        credentialsId: "${NEXUS_LOGIN}",
-        artifacts: [
-            [artifactId: 'vproapp',
-             classifier: '',
-             file: 'target/vprofile-v2.war',
-             type: 'war']
-        ]
-     )
             }
         }
     }

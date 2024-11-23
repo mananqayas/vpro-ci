@@ -24,7 +24,7 @@ pipeline {
         CENTRAL_REPO='vpro-maven-central'
         NEXUS_GRP_REPO='vprofile-maven-group'
         NEXUS_LOGIN='nexuslogin'
-        NEXUSIP='172.31.35.26'
+        NEXUSIP='172.31.83.42'
         NEXUSPORT='8081'
         SONARSERVER='sonarserver'
         SONARSCANNER='sonarscanner'
